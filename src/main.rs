@@ -1,46 +1,57 @@
 fn main() {
-    let input = "{()}/*/* != == =";
-    let mut iter = input.chars().enumerate().peekable();
+    let input = String::from("{()}/*/* != == =");
+    let mut iter = input.as_bytes().windows(3);
     let mut output: String = String::default();
 
-    while let Some((i, c)) = iter.next() {
-        if c == ' ' { 
+    while let Some([c, n, n2]) = iter.next() {
+        if char::from(*c) == ' ' {
             continue;
         }
         output.push_str(
-            match c {
+            match char::from(*c) {
                 ')' => Token::RParen,
                 '{' => Token::LBrace,
                 '(' => Token::LParen,
                 '}' => Token::RBrace,
                 '+' => Token::Plus,
                 '-' => Token::Minus,
-                '!' => match iter.peek() == Some(&(i + 1, '=')) {
+                '!' => match char::from(*n) == '=' {
                     true => {
                         iter.next();
                         Token::NotEqual
-                    },
+                    }
                     false => Token::Bang,
                 },
-                '=' => match iter.peek() == Some(&(i + 1, '=')) {
+                '=' => match char::from(*n) == '=' {
                     true => {
                         iter.next();
                         Token::Equal
-                    },
+                    }
                     false => Token::Assign,
                 },
                 '/' => Token::Slash,
                 '*' => Token::Asterisk,
-                'l' => match iter.peek() == Some(&(i + 1, 'e')) {
-                    true => {
-                        iter.next();
-                        Token::Equal
-                    },
-                    false => Token::Assign,
-                }
-               _ => Token::Nil,
+                _ => if char::from(*c) == 'l' || char::from(*c) == 'L'{
+                        if char::from(*n) == 'e' || char::from(*n) == 'E' && char::from(*n2) =='t' || char::from(*n2) == 'T'{
+                            return  Token::Let;
+
+                    }
+                        
+                }else  {
+                            let mut identity = String::default();
+                            identity.push(char::from(*c));
+                            while let Some([t])= iter.next(){
+                                if char::from(*t) != ' '{ 
+                                    break;
+                                }
+                                identity.push(char::from(*t));
+                            }
+
+                            Token::Identity(identity)
+                        }
+
             }
-            .as_str(),
+                .as_str(),
         );
     }
 
@@ -65,6 +76,7 @@ enum Token {
     Slash,
 
     Nil,
+    Let,
 }
 
 impl Token {
