@@ -1,16 +1,15 @@
-use std::borrow::BorrowMut;
-
 fn main() {
     let input = String::from("{()}/*/* != == =  adil ");
     let mut iter = input.as_bytes().windows(3);
     let mut output: String = String::default();
 
-        while let Some([c, n, n2]) = iter.next() {
+    while let Some([c, n, n2]) = iter.next() {
         if char::from(*c) == ' ' {
             continue;
         }
-        
-           output.push_str(   match char::from(*c) {
+
+        output.push_str(
+            match char::from(*c) {
                 ')' => Token::RParen,
                 '{' => Token::LBrace,
                 '(' => Token::LParen,
@@ -33,35 +32,31 @@ fn main() {
                 },
                 '/' => Token::Slash,
                 '*' => Token::Asterisk,
-                _ => if char::from(*c) == 'l' || char::from(*c) == 'L'{
-                        if char::from(*n) == 'e' || char::from(*n) == 'E' && char::from(*n2) =='t' || char::from(*n2) == 'T'{
-                            Token::Let
+                _ => {
+                    if (char::from(*c) == 'l' || char::from(*c) == 'L')
+                            && (char::from(*n) == 'e' || char::from(*n) == 'E')
+                            && (char::from(*n2) == 't' || char::from(*n2) == 'T')
+                    {
+                        Token::Let
                     } else {
-                       let mut identity = String::default();
-                            identity.push(char::from(*c));
-                            while let Some([t])= iter.next(){
-                                if char::from(*t) != ' '{ 
-                                    break;
-                                }
-                                identity.push(char::from(*t));
+                        let mut identity = String::default();
+                        identity.push(char::from(*c));
+                        identity.push(char::from(*n));
+                        identity.push(char::from(*n2));
+                        while let Some([_x, _y, z]) = iter.next() {
+                            if char::from(*z) == ' ' {
+                                break;
                             }
-                            Token::Identity(identity)
-                    }
-                        
-                }else  {
-                            let mut identity = String::default();
-                            identity.push(char::from(*c));
-                            while let Some([t])= iter.next(){
-                                if char::from(*t) != ' '{ 
-                                    break;
-                                }
-                                identity.push(char::from(*t));
-                            }
-
-                            Token::Identity(identity)
+                            identity.push(char::from(*z))
                         }
-            }.to_string().as_str())
-        }
+                        Token::Identity(identity)
+                    }
+                }
+            }
+            .to_string()
+            .as_str(),
+        )
+    }
 
     println!("{}", output)
 }
@@ -91,9 +86,8 @@ impl Token {
     fn to_string(&self) -> String {
         match self {
             Token::Identity(s) => {
-               format!("Identity ({})", s)
-            }, 
-
+                format!("Identity ({:?})", s)
+            }
 
             Token::LParen => String::from("("),
             Token::RParen => String::from(")"),
