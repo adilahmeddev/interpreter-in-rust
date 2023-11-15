@@ -1,14 +1,16 @@
+use std::borrow::BorrowMut;
+
 fn main() {
-    let input = String::from("{()}/*/* != == =");
+    let input = String::from("{()}/*/* != == =  adil ");
     let mut iter = input.as_bytes().windows(3);
     let mut output: String = String::default();
 
-    while let Some([c, n, n2]) = iter.next() {
+        while let Some([c, n, n2]) = iter.next() {
         if char::from(*c) == ' ' {
             continue;
         }
-        output.push_str(
-            match char::from(*c) {
+        
+           output.push_str(   match char::from(*c) {
                 ')' => Token::RParen,
                 '{' => Token::LBrace,
                 '(' => Token::LParen,
@@ -33,8 +35,17 @@ fn main() {
                 '*' => Token::Asterisk,
                 _ => if char::from(*c) == 'l' || char::from(*c) == 'L'{
                         if char::from(*n) == 'e' || char::from(*n) == 'E' && char::from(*n2) =='t' || char::from(*n2) == 'T'{
-                            return  Token::Let;
-
+                            Token::Let
+                    } else {
+                       let mut identity = String::default();
+                            identity.push(char::from(*c));
+                            while let Some([t])= iter.next(){
+                                if char::from(*t) != ' '{ 
+                                    break;
+                                }
+                                identity.push(char::from(*t));
+                            }
+                            Token::Identity(identity)
                     }
                         
                 }else  {
@@ -49,11 +60,8 @@ fn main() {
 
                             Token::Identity(identity)
                         }
-
-            }
-                .as_str(),
-        );
-    }
+            }.to_string().as_str())
+        }
 
     println!("{}", output)
 }
@@ -80,22 +88,27 @@ enum Token {
 }
 
 impl Token {
-    fn as_str(&self) -> &str {
+    fn to_string(&self) -> String {
         match self {
-            Token::Identity(s) => s,
-            Token::LParen => "(",
-            Token::RParen => ")",
-            Token::LBrace => "{",
-            Token::RBrace => "}",
-            Token::Nil => "nil",
-            Token::Bang => "!",
-            Token::Plus => "+",
-            Token::Minus => "-",
-            Token::Assign => "=",
-            Token::Equal => "==",
-            Token::NotEqual => "!=",
-            Token::Asterisk => "*",
-            Token::Slash => "/",
+            Token::Identity(s) => {
+               format!("Identity ({})", s)
+            }, 
+
+
+            Token::LParen => String::from("("),
+            Token::RParen => String::from(")"),
+            Token::LBrace => String::from("{"),
+            Token::RBrace => String::from("}"),
+            Token::Nil => String::from("nil"),
+            Token::Bang => String::from("!"),
+            Token::Plus => String::from("+"),
+            Token::Minus => String::from("-"),
+            Token::Assign => String::from("="),
+            Token::Equal => String::from("=="),
+            Token::NotEqual => String::from("!="),
+            Token::Asterisk => String::from("*"),
+            Token::Slash => String::from("/"),
+            Token::Let => String::from("let"),
         }
     }
 }
