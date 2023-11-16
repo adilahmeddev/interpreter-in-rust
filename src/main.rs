@@ -1,9 +1,9 @@
 fn main() {
-    let input = String::from("{()}/*/* != == =  adil ");
+    let input = String::from("{()}/*/* != == =  adil let le");
     let mut iter = input.as_bytes().windows(3);
     let mut output: String = String::default();
 
-    while let Some([c, n, n2]) = iter.next() {
+    while let Some([c, n, m]) = iter.next() {
         if char::from(*c) == ' ' {
             continue;
         }
@@ -33,22 +33,45 @@ fn main() {
                 '/' => Token::Slash,
                 '*' => Token::Asterisk,
                 _ => {
+
+                        println!("c {:?} n {:?} m {:?}", char::from(*c), char::from(*n), char::from(*m));
                     if (char::from(*c) == 'l' || char::from(*c) == 'L')
                             && (char::from(*n) == 'e' || char::from(*n) == 'E')
-                            && (char::from(*n2) == 't' || char::from(*n2) == 'T')
+                            && (char::from(*m) == 't' || char::from(*m) == 'T')
                     {
+                        println!("token is let {:?} {:?} {:?} ", char::from(*c), char::from(*n), char::from(*m));
+                        iter.next();
+                        iter.next();
                         Token::Let
                     } else {
+
+                        println!("token is not let");
                         let mut identity = String::default();
-                        identity.push(char::from(*c));
-                        identity.push(char::from(*n));
-                        identity.push(char::from(*n2));
+                        if char::from(*c) != ' '{
+                            identity.push(char::from(*c));
+                        println!("c is let {:?}", char::from(*c));
+                        
+                        if char::from(*n) != ' '{
+                            identity.push(char::from(*n));
+                        println!("n is let {:?}", char::from(*n));
+                        
+
+                        if char::from(*m) != ' '{
+                            identity.push(char::from(*m));
+                        println!("m is let {:?}", char::from(*m));
+                        
+
                         while let Some([_x, _y, z]) = iter.next() {
+                            
+                        println!("z is let {:?}", char::from(*z));
                             if char::from(*z) == ' ' {
+                                            println!("z is a space");
+                                iter.next();
+                                            iter.next();
                                 break;
                             }
                             identity.push(char::from(*z))
-                        }
+                        }}}}
                         Token::Identity(identity)
                     }
                 }
