@@ -1,86 +1,64 @@
 fn main() {
     let input = String::from("{()}/*/* != == =  adil let le");
-    let mut iter = input.as_bytes().windows(3);
     let mut output: String = String::default();
 
-    while let Some([c, n, m]) = iter.next() {
-        if char::from(*c) == ' ' {
-            continue;
-        }
+    let arr = input.as_bytes();
 
+    let mut pos = 0;
+    let mut peek = 1;
+    while peek < input.len() {
+        let c = arr[pos];
+        let n = arr[peek];
         output.push_str(
-            match char::from(*c) {
+            match char::from(c) {
                 ')' => Token::RParen,
                 '{' => Token::LBrace,
                 '(' => Token::LParen,
                 '}' => Token::RBrace,
                 '+' => Token::Plus,
                 '-' => Token::Minus,
-                '!' => match char::from(*n) == '=' {
-                    true => {
-                        iter.next();
-                        Token::NotEqual
-                    }
-                    false => Token::Bang,
-                },
-                '=' => match char::from(*n) == '=' {
-                    true => {
-                        iter.next();
-                        Token::Equal
-                    }
-                    false => Token::Assign,
-                },
+                '!' if char::from(n) == '=' => {
+                    peek += 1;
+
+                    Token::NotEqual
+                }
+                '=' if char::from(n) == '=' => {
+                    peek += 1;
+                    Token::Equal
+                }
+                '!' => Token::Bang,
+                '=' => Token::Assign,
                 '/' => Token::Slash,
                 '*' => Token::Asterisk,
-                _ => {
-
-                        println!("c {:?} n {:?} m {:?}", char::from(*c), char::from(*n), char::from(*m));
-                    if (char::from(*c) == 'l' || char::from(*c) == 'L')
-                            && (char::from(*n) == 'e' || char::from(*n) == 'E')
-                            && (char::from(*m) == 't' || char::from(*m) == 'T')
-                    {
-                        println!("token is let {:?} {:?} {:?} ", char::from(*c), char::from(*n), char::from(*m));
-                        iter.next();
-                        iter.next();
-                        Token::Let
-                    } else {
-
-                        println!("token is not let");
-                        let mut identity = String::default();
-                        if char::from(*c) != ' '{
-                            identity.push(char::from(*c));
-                        println!("c is let {:?}", char::from(*c));
-                        
-                        if char::from(*n) != ' '{
-                            identity.push(char::from(*n));
-                        println!("n is let {:?}", char::from(*n));
-                        
-
-                        if char::from(*m) != ' '{
-                            identity.push(char::from(*m));
-                        println!("m is let {:?}", char::from(*m));
-                        
-
-                        while let Some([_x, _y, z]) = iter.next() {
-                            
-                        println!("z is let {:?}", char::from(*z));
-                            if char::from(*z) == ' ' {
-                                            println!("z is a space");
-                                iter.next();
-                                            iter.next();
-                                break;
-                            }
-                            identity.push(char::from(*z))
-                        }}}}
-                        Token::Identity(identity)
-                    }
+                ' ' => Token::Blank,
+                'l' if char::from(n) == 'e'
+                    && peek + 1 < arr.len() - 1
+                    && char::from(arr[peek + 1]) == 't' =>
+                {
+                    peek += 2;
+                    Token::Let
                 }
+                tok if tok.is_alphabetic() => loop {
+                    let n = char::from(arr[peek]);
+                    println!("n {:?}", char::from(n));
+                    if n == ' ' || peek == arr.len() - 1 {
+                        let mut x = arr[pos..peek].to_vec();
+                        if n != ' ' {
+                            x.push(arr[peek]);
+                        }
+                        let out: String = x.iter().clone().map(|z| char::from(*z)).collect();
+                        break Token::Identity(out.to_string());
+                    }
+                    peek += 1;
+                },
+                _ => Token::Nil,
             }
             .to_string()
             .as_str(),
-        )
+        );
+        pos = peek;
+        peek += 1;
     }
-
     println!("{}", output)
 }
 
@@ -103,6 +81,7 @@ enum Token {
 
     Nil,
     Let,
+    Blank,
 }
 
 impl Token {
@@ -112,20 +91,21 @@ impl Token {
                 format!("Identity ({:?})", s)
             }
 
-            Token::LParen => String::from("("),
-            Token::RParen => String::from(")"),
-            Token::LBrace => String::from("{"),
-            Token::RBrace => String::from("}"),
-            Token::Nil => String::from("nil"),
-            Token::Bang => String::from("!"),
-            Token::Plus => String::from("+"),
-            Token::Minus => String::from("-"),
-            Token::Assign => String::from("="),
-            Token::Equal => String::from("=="),
-            Token::NotEqual => String::from("!="),
-            Token::Asterisk => String::from("*"),
-            Token::Slash => String::from("/"),
-            Token::Let => String::from("let"),
+            Token::LParen => String::from(" ( "),
+            Token::RParen => String::from(" ) "),
+            Token::LBrace => String::from(" { "),
+            Token::RBrace => String::from(" } "),
+            Token::Nil => String::from(" nil "),
+            Token::Bang => String::from(" ! "),
+            Token::Plus => String::from(" + "),
+            Token::Minus => String::from(" - "),
+            Token::Assign => String::from(" = "),
+            Token::Equal => String::from(" == "),
+            Token::NotEqual => String::from(" != "),
+            Token::Asterisk => String::from(" * "),
+            Token::Slash => String::from(" / "),
+            Token::Let => String::from(" let "),
+            Token::Blank => String::default(),
         }
     }
 }
