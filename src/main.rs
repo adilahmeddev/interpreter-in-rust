@@ -58,7 +58,7 @@ fn main() {
         pos = peek;
         peek += 1;
     }
-    println!("{}", output)
+    println!("{output}", output)
 }
 
 enum Token {
@@ -86,10 +86,7 @@ enum Token {
 impl Token {
     fn to_string(&self) -> String {
         match self {
-            Token::Identity(s) => {
-                format!("Identity ({:?})", s)
-            }
-
+            Token::Identity(s) => format!(" {s} "),
             Token::LParen => String::from(" ( "),
             Token::RParen => String::from(" ) "),
             Token::LBrace => String::from(" { "),
