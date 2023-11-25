@@ -40,7 +40,6 @@ fn main() {
                 }
                 tok if tok.is_alphabetic() => loop {
                     let n = char::from(arr[peek]);
-                    println!("n {:?}", char::from(n));
                     if n == ' ' || peek == arr.len() - 1 {
                         let mut x = arr[pos..peek].to_vec();
                         if n != ' ' {
