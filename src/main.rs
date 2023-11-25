@@ -58,7 +58,7 @@ fn main() {
         pos = peek;
         peek += 1;
     }
-    println!("{output}", output)
+    println!("{output}")
 }
 
 enum Token {
